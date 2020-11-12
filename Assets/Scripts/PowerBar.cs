@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class PowerBar : MonoBehaviour
 {
+    //powerbar Variables
     public GameObject powerBarGO;
     public Image PowerBarMask;
     public float barChangeSpeed = 1;
@@ -12,9 +13,20 @@ public class PowerBar : MonoBehaviour
     float currentPowerBarValue;
     bool powerIsIncreasing;
     bool PowerBarON;
-    // Start is called before the first frame update
+    public float powerMultiplied = 10f;
+
+    //Rigidbody AddForce variables
+    public Rigidbody rb;
+    Vector3 dir;
+    public Transform target;
+
     void Start()
     {
+        //AddForce
+        dir = target.transform.position - transform.position;
+        dir = dir.normalized;
+
+        //PowerBar
         currentPowerBarValue = 0;
         powerIsIncreasing = true;
         PowerBarON = true;
@@ -46,10 +58,10 @@ public class PowerBar : MonoBehaviour
             PowerBarMask.fillAmount = fill;
             yield return new WaitForSeconds(0.02f);
 
-            if (Input.touchCount > 0)
+            if (Input.GetKeyDown(KeyCode.Mouse0))
             {
                 PowerBarON = false;
-                LaunchRocket();
+                ShotTaken();
                 StartCoroutine(TurnOffPowerBar());
 
             }
@@ -62,13 +74,18 @@ public class PowerBar : MonoBehaviour
         powerBarGO.SetActive(false);
     }
 
-    public void LaunchRocket()
+    public void ShotTaken()
     {
-        Debug.Log("RocketLaunched");
+        Debug.Log("Hit");
+        Debug.Log(currentPowerBarValue);
+        //Animation for character to hit ball would go here
+        //The force would be the currentPowerBarValue
     }
-    // Update is called once per frame
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-
+        if(collision.gameObject.tag == "Player")
+        {
+            rb.AddForce(dir * (currentPowerBarValue * powerMultiplied));
+        }
     }
 }
